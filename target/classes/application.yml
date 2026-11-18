@@ -1,0 +1,61 @@
+spring:
+  application:
+    name: engineBroker
+  profiles:
+    default: local
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: ${KAFKA_CONSUMER_GROUP:engineBroker}
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    listener:
+      ack-mode: record
+  ai:
+    ollama:
+      base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
+      chat:
+        options:
+          model: ${OLLAMA_MODEL:llama3.2:3b}
+          temperature: ${OLLAMA_TEMPERATURE:0.2}
+
+app:
+  manage-database:
+    request-topic: ${MANAGEDATABASE_REQUEST_TOPIC:manageDatabase.requests}
+    response-topic: ${MANAGEDATABASE_RESPONSE_TOPIC:manageDatabase.responses}
+    send-timeout: ${MANAGEDATABASE_SEND_TIMEOUT:5s}
+    response-timeout: ${MANAGEDATABASE_RESPONSE_TIMEOUT:15s}
+    dead-letter-suffix: ${KAFKA_DLT_SUFFIX:.DLT}
+    retry-interval-ms: ${KAFKA_RETRY_INTERVAL_MS:1000}
+    max-retries: ${KAFKA_MAX_RETRIES:2}
+  research:
+    ai-timeout: ${AI_TIMEOUT:90s}
+    ai:
+      provider: ${AI_PROVIDER:ollama}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true
+  health:
+    readinessstate:
+      enabled: true
+    livenessstate:
+      enabled: true
+
+logging:
+  level:
+    com.gtech.automaticbroker.enginebroker: ${APP_LOG_LEVEL:INFO}
+  pattern:
+    level: "%5p [corr:%X{correlationId:-}]"

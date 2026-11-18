@@ -1,0 +1,184 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > WebData</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.gtech.automaticbroker.managedatabase.domain.entity</a>
+</div>
+
+<h1>Coverage Summary for Class: WebData (com.gtech.automaticbroker.managedatabase.domain.entity)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WebData</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.gtech.automaticbroker.managedatabase.domain.entity;
+&nbsp;
+&nbsp;import org.springframework.data.mongodb.core.mapping.Document;
+&nbsp;
+&nbsp;@Document(collection = &quot;webData&quot;)
+<b class="nc">&nbsp;public class WebData extends CrudDocument {</b>
+&nbsp;
+&nbsp;    private String url;
+&nbsp;    private Object auth;
+&nbsp;    private String date;
+&nbsp;    private Object operations;
+&nbsp;    private Object roles;
+&nbsp;    private String type;
+&nbsp;    private String description;
+&nbsp;    private String enabled;
+&nbsp;
+&nbsp;    public String getUrl() {
+<b class="nc">&nbsp;        return url;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setUrl(String url) {
+<b class="nc">&nbsp;        this.url = url;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Object getAuth() {
+<b class="nc">&nbsp;        return auth;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setAuth(Object auth) {
+<b class="nc">&nbsp;        this.auth = auth;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getDate() {
+<b class="nc">&nbsp;        return date;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setDate(String date) {
+<b class="nc">&nbsp;        this.date = date;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Object getOperations() {
+<b class="nc">&nbsp;        return operations;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setOperations(Object operations) {
+<b class="nc">&nbsp;        this.operations = operations;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Object getRoles() {
+<b class="nc">&nbsp;        return roles;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setRoles(Object roles) {
+<b class="nc">&nbsp;        this.roles = roles;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getType() {
+<b class="nc">&nbsp;        return type;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setType(String type) {
+<b class="nc">&nbsp;        this.type = type;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getDescription() {
+<b class="nc">&nbsp;        return description;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setDescription(String description) {
+<b class="nc">&nbsp;        this.description = description;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getEnabled() {
+<b class="nc">&nbsp;        return enabled;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setEnabled(String enabled) {
+<b class="nc">&nbsp;        this.enabled = enabled;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-11-09 16:33</div>
+</div>
+</body>
+</html>

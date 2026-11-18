@@ -1,0 +1,106 @@
+# Implementación de operaciones CRUD mediante Kafka en manageDatabase
+
+## Objetivo
+
+Completa el microservicio `manageDatabase` existente para que procese solicitudes Kafka sobre las siete colecciones Automatic Broker que ya tienen modelos, repositorios y servicios CRUD. No crees otro proyecto ni cambies la tecnología de persistencia.
+
+Las operaciones deben entrar por el consumidor Kafka existente, delegarse a la capa de servicio y devolver el resultado al topic de respuestas configurado. La lógica de negocio/persistencia debe permanecer en servicios y repositorios, no en el listener.
+
+## Colecciones incluidas
+
+Usa exactamente los nombres físicos existentes:
+
+- `manageUserData`
+- `biData`
+- `histData`
+- `stadisticData`
+- `webData`
+- `opData`
+- `globalConfiguration`
+
+## Operaciones de esta fase
+
+Implementa solo:
+
+- `GET`: consulta un documento por `id`.
+- `CREATE`: inserta un documento y devuelve el documento persistido.
+- `UPDATE`: actualiza los campos recibidos sin reemplazar los campos omitidos ni permitir cambiar el identificador, y devuelve el documento actualizado.
+
+No implementes por ahora `DELETE`, `GET_MANY`, filtros, paginación, endpoints REST ni reglas de negocio no especificadas. Si se recibe una operación o colección no soportada, devuelve un resultado funcional rechazado, sin afirmar éxito.
+
+## Contrato temporal del payload
+
+El sobre Kafka conserva el contrato implementado por `RequestEnvelope`: `messageId`, `correlationId`, `operation`, `payload` y `responseRequired`. El `payload` es un objeto JSON con la colección y los datos de la operación:
+
+Consulta:
+
+```json
+{
+  "collection": "biData",
+  "id": "identificador-del-documento"
+}
+```
+
+Inserción:
+
+```json
+{
+  "collection": "biData",
+  "document": {
+    "sourceId": "source-1",
+    "sourceName": "fuente"
+  }
+}
+```
+
+Modificación parcial:
+
+```json
+{
+  "collection": "biData",
+  "id": "identificador-del-documento",
+  "changes": {
+    "sourceName": "fuente actualizada"
+  }
+}
+```
+
+El nombre de la colección debe coincidir exactamente con uno de los siete admitidos. Los servicios existentes generan el `id` al insertar cuando no se proporciona. No permitas modificar `id` ni `_id`.
+
+El resultado de éxito contiene el documento consultado, insertado o actualizado dentro de `ResponseEnvelope.result`. Los errores funcionales deben usar el estado y los campos de error ya definidos por el sobre. Conserva `requestId`, `correlationId` y la operación original. Publica respuesta únicamente si `responseRequired` es `true`. Los errores técnicos inesperados deben propagarse para que se aplique la política existente de reintentos y DLT.
+
+## Arquitectura y persistencia
+
+Respeta la estructura actual del paquete `com.gtech.automaticbroker.managedatabase`:
+
+```text
+config/
+service/
+  impl/
+domain/
+  entity/
+  repository/
+kafka/
+  entity/
+  consumer/
+  producer/
+util/
+  exception/
+  observability/
+```
+
+- Los servicios contienen la lógica CRUD y sus implementaciones terminan en `Impl`.
+- `KafkaRequestListener` valida/adapta el transporte y delega a `OperationService`.
+- `KafkaResponsePublisher` sigue siendo responsable de publicar las respuestas.
+- La configuración de topics y Kafka se obtiene de las propiedades existentes; no fijes topics en código ni añadas infraestructura.
+- Este proyecto utiliza MongoDB: las entidades persistidas usan `@Document` y el identificador `@Id`, que Mongo almacena como `_id`. No añadas `@Entity`, JPA ni repositorios relacionales, pues serían incompatibles con la base configurada.
+- Reutiliza los modelos y servicios existentes; no muevas clases ni crees paquetes paralelos.
+- Conserva la protección existente frente a claves `password` en claro.
+
+## Validación y pruebas
+
+Añade pruebas para el enrutamiento a las siete colecciones, `GET`, `CREATE`, `UPDATE` parcial, payload/colección/operación inválidos, identificador ausente, documento inexistente o duplicado y propagación de fallos técnicos. Verifica también que una solicitud sin respuesta no publique en Kafka y que las respuestas conserven la correlación.
+
+Mantén la cobertura de líneas del bundle en un mínimo del 85 %, ya configurado en JaCoCo. Ejecuta las pruebas y la verificación Maven para comprobar cobertura; informa claramente si una prueba de integración no se ejecuta por falta de Docker.
+
+Actualiza `docs/context/PROJECT_CONTEXT.md` y la documentación de uso para reflejar cualquier contrato o comportamiento que implementes. No dejes instrucciones que contradigan el código.

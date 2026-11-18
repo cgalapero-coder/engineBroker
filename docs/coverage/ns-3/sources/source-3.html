@@ -1,0 +1,175 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GlobalConfiguration</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.gtech.automaticbroker.managedatabase.domain.entity</a>
+</div>
+
+<h1>Coverage Summary for Class: GlobalConfiguration (com.gtech.automaticbroker.managedatabase.domain.entity)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GlobalConfiguration</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.gtech.automaticbroker.managedatabase.domain.entity;
+&nbsp;
+&nbsp;import org.springframework.data.mongodb.core.mapping.Document;
+&nbsp;
+&nbsp;@Document(collection = &quot;globalConfiguration&quot;)
+<b class="nc">&nbsp;public class GlobalConfiguration extends CrudDocument {</b>
+&nbsp;
+&nbsp;    private Object selectedOptions;
+&nbsp;    private String mode;
+&nbsp;    private Object dataToStore;
+&nbsp;    private String logLevel;
+&nbsp;    private String language;
+&nbsp;    private Object operationalLimits;
+&nbsp;    private Object otherParameters;
+&nbsp;
+&nbsp;    public Object getSelectedOptions() {
+<b class="nc">&nbsp;        return selectedOptions;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSelectedOptions(Object selectedOptions) {
+<b class="nc">&nbsp;        this.selectedOptions = selectedOptions;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getMode() {
+<b class="nc">&nbsp;        return mode;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setMode(String mode) {
+<b class="nc">&nbsp;        this.mode = mode;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Object getDataToStore() {
+<b class="nc">&nbsp;        return dataToStore;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setDataToStore(Object dataToStore) {
+<b class="nc">&nbsp;        this.dataToStore = dataToStore;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getLogLevel() {
+<b class="nc">&nbsp;        return logLevel;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setLogLevel(String logLevel) {
+<b class="nc">&nbsp;        this.logLevel = logLevel;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getLanguage() {
+<b class="nc">&nbsp;        return language;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setLanguage(String language) {
+<b class="nc">&nbsp;        this.language = language;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Object getOperationalLimits() {
+<b class="nc">&nbsp;        return operationalLimits;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setOperationalLimits(Object operationalLimits) {
+<b class="nc">&nbsp;        this.operationalLimits = operationalLimits;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Object getOtherParameters() {
+<b class="nc">&nbsp;        return otherParameters;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setOtherParameters(Object otherParameters) {
+<b class="nc">&nbsp;        this.otherParameters = otherParameters;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-11-09 16:33</div>
+</div>
+</body>
+</html>

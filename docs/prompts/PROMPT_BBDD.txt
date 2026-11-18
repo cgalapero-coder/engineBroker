@@ -1,0 +1,278 @@
+necesito crear un microservicio nuevo.
+
+# Objetivo
+
+Crea un microservicio nuevo. Añadiendo un proyecto nuevo en este workspace de Intellij. Con todo lo que solicito a continuación:
+
+Genera la base técnica de un microservicio Java con Spring Boot, MongoDB y Apache Kafka.
+
+El microservicio recibirá peticiones mediante Kafka y permitirá implementar operaciones de alta, baja, modificación y consulta sobre MongoDB.
+
+**En esta fase debes construir la infraestructura técnica y la arquitectura del microservicio, no desarrollar todavía la lógica funcional específica del negocio.** Los detalles funcionales, el modelo de dominio definitivo, los nombres de los campos y las reglas de validación se especificarán posteriormente.
+
+# 1. Versiones y dependencias
+
+Utiliza las últimas versiones estables y compatibles disponibles en el momento de generar el proyecto.
+
+Como referencia inicial, utiliza:
+
+* Java 21 LTS.
+* Spring Boot 4.1.2.
+* Spring Framework 7.0.x, gestionado por Spring Boot.
+* Spring Data MongoDB 5.1.x, gestionado por Spring Boot.
+* Spring for Apache Kafka 4.1.x, gestionado por Spring Boot.
+* Apache Kafka 4.1.0 como broker de desarrollo local.
+* MongoDB 8.x como base de datos de desarrollo.
+
+Antes de generar el código, comprueba si las versiones de referencia siguen siendo las últimas versiones estables y compatibles. Si existe una actualización estable compatible, puedes utilizarla, documentando las versiones elegidas.
+
+No utilices versiones preliminares, RC, milestones, snapshots ni versiones experimentales.
+
+No fuerces manualmente las versiones de Spring Framework, Spring Data, Spring Kafka ni de sus dependencias transitivas cuando Spring Boot ya las gestione mediante su BOM.
+
+No confundas la versión del cliente Java de Kafka con la versión del broker Apache Kafka.
+
+Utiliza Maven como sistema de construcción e incluye Maven Wrapper.
+
+# 2. Arquitectura
+
+Diseña una arquitectura modular, mantenible, testeable y preparada para evolucionar.
+
+Separa claramente las siguientes responsabilidades:
+
+* Configuración de la aplicación.
+* Configuración y consumo de Kafka.
+* Mensajería de entrada y salida.
+* Capa de aplicación y casos de uso.
+* Dominio.
+* Persistencia MongoDB.
+* Manejo centralizado de errores.
+* Observabilidad y comprobaciones de salud.
+
+Aplica principios de arquitectura limpia y separación de responsabilidades sin introducir complejidad innecesaria.
+
+Evita que las clases de dominio dependan directamente de Kafka, MongoDB o del framework de transporte.
+
+No concentres toda la lógica en los consumidores Kafka ni crees una única clase que gestione mensajería, negocio y persistencia.
+
+Utiliza nombres de paquetes coherentes y una estructura que facilite incorporar posteriormente nuevos casos de uso.
+
+# 3. Comunicación mediante Kafka
+
+El microservicio debe recibir solicitudes a través de Kafka.
+
+Implementa la infraestructura necesaria para consumir mensajes utilizando Spring for Apache Kafka.
+
+Diseña la mensajería para soportar operaciones de:
+
+* Alta.
+* Baja.
+* Modificación.
+* Consulta individual.
+* Consulta de múltiples registros.
+
+No inventes todavía los contratos funcionales definitivos de estas operaciones. Define únicamente la estructura técnica y utiliza contratos de ejemplo claramente identificados como provisionales, fáciles de sustituir.
+
+Distingue entre dos tipos de mensajes:
+
+1. Solicitudes que esperan una respuesta.
+2. Eventos o mensajes que no necesitan una respuesta inmediata.
+
+Para las operaciones de consulta y las demás operaciones que requieran confirmación, prepara un mecanismo de petición-respuesta mediante Kafka.
+
+El diseño debe contemplar:
+
+* Identificador de correlación (`correlationId`).
+* Identificación de la solicitud.
+* Identificación de la operación.
+* Payload.
+* Resultado de la operación.
+* Errores funcionales y técnicos.
+* Identificación del mensaje de respuesta.
+* Un mecanismo configurable para determinar el destino de las respuestas.
+* Un tiempo de espera configurable para las respuestas.
+* Manejo de mensajes no procesables.
+* Política de reintentos configurable.
+* Estrategia para mensajes fallidos y Dead Letter Topic (DLT).
+
+No presupongas que cualquier mensaje consumido debe generar una respuesta si el contrato correspondiente no lo requiere.
+
+Diseña el procesamiento teniendo en cuenta la entrega de mensajes al menos una vez y la posibilidad de que un mensaje se procese más de una vez.
+
+No afirmes que el procesamiento es exactamente una vez de extremo a extremo si la arquitectura no puede garantizarlo.
+
+Prepara la estructura para incorporar idempotencia y evitar duplicados cuando corresponda.
+
+No implementes todavía reglas específicas de negocio ni políticas definitivas de reintentos, retención o particionado.
+
+# 4. Persistencia MongoDB
+
+Utiliza Spring Data MongoDB.
+
+Prepara la configuración de conexión mediante propiedades externas y variables de entorno.
+
+No incluyas credenciales reales en el código fuente.
+
+Utiliza repositorios y servicios de persistencia separados de la capa de mensajería.
+
+Evita acoplar las clases de dominio al documento MongoDB cuando ello dificulte la evolución del modelo.
+
+No inventes el esquema definitivo de la colección ni sus índices. Si necesitas una entidad provisional para demostrar el funcionamiento, identifícala claramente como ejemplo reemplazable.
+
+Prepara el proyecto para incorporar posteriormente:
+
+* Altas de documentos.
+* Bajas.
+* Modificaciones.
+* Consultas por identificador.
+* Consultas con criterios.
+* Paginación y ordenación cuando sean necesarias.
+* Validaciones.
+* Índices específicos del dominio.
+
+No implementes consultas dinámicas genéricas que puedan comprometer la seguridad o permitir acceso indiscriminado a los datos.
+
+# 5. Configuración
+
+Toda configuración específica del entorno debe ser externa al código.
+
+Utiliza perfiles de Spring cuando resulte apropiado, por ejemplo, `local`, `test` y `prod`.
+
+Como configuración inicial para el entorno local, utiliza:
+
+MongoDB:
+
+* Host: localhost.
+* Puerto: 27017.
+* Usuario: devuser.
+* Base de datos: microservices.
+* Autenticación: base de datos admin.
+
+Kafka:
+
+* Bootstrap servers: localhost:9092.
+
+Estas direcciones corresponden a la ejecución de la aplicación Java directamente en Windows, fuera de Docker.
+
+Si posteriormente se ejecuta el microservicio dentro de Docker Compose, contempla la necesidad de utilizar los nombres de servicio y las direcciones internas correspondientes.
+
+No incluyas las contraseñas en el repositorio. Utiliza variables de entorno para suministrarlas.
+
+No modifiques la instalación de Docker, el contenedor de Kafka, el contenedor de MongoDB ni el archivo Docker Compose existente.
+
+No cambies la configuración del broker sin justificar por qué es necesario.
+
+# 6. Observabilidad y operación
+
+Prepara la aplicación para ejecutarse en un entorno de desarrollo y evolucionar posteriormente a producción.
+
+Incluye, cuando sea compatible con la versión seleccionada de Spring Boot:
+
+* Spring Boot Actuator.
+* Comprobaciones de salud de la aplicación.
+* Comprobaciones de disponibilidad de MongoDB y Kafka.
+* Logs estructurados o, como mínimo, logs consistentes.
+* Identificadores de correlación en los logs.
+* Gestión centralizada de excepciones.
+* Métricas básicas de la aplicación y del procesamiento de mensajes.
+
+No expongas credenciales, datos sensibles ni el contenido completo de mensajes que puedan contener información confidencial.
+
+No expongas todos los endpoints de Actuator indiscriminadamente.
+
+# 7. Calidad del código
+
+Aplica buenas prácticas de Java y Spring:
+
+* Inyección de dependencias por constructor.
+* Clases pequeñas con responsabilidades definidas.
+* Uso apropiado de records y tipos inmutables cuando corresponda.
+* Validación de entradas.
+* Gestión explícita de errores.
+* Evitar capturar excepciones para ignorarlas.
+* Evitar el uso indiscriminado de clases genéricas y tipos `Object`.
+* Evitar abstracciones innecesarias.
+* No utilizar APIs obsoletas.
+* No duplicar configuraciones que Spring Boot gestione automáticamente.
+* No añadir dependencias sin una necesidad concreta.
+
+Incorpores Lombok, am mi me facilita la lectura del código
+
+# 8. Pruebas
+
+Prepara una estrategia de pruebas con:
+
+* Pruebas unitarias de los casos de uso.
+* Pruebas de los componentes de mensajería.
+* Pruebas de persistencia MongoDB.
+* Pruebas de serialización y deserialización de mensajes.
+* Pruebas del contrato de petición-respuesta.
+* Pruebas de errores y mensajes no válidos.
+
+Utiliza JUnit 5 y las herramientas de prueba compatibles con las versiones elegidas.
+
+Utiliza Testcontainers cuando aporte valor para probar MongoDB y Kafka reales en pruebas de integración.
+
+No dependas de que el entorno de desarrollo local esté levantado para ejecutar las pruebas unitarias.
+
+No escribas pruebas que solo comprueben que un método devuelve un valor constante sin verificar su comportamiento.
+
+# 9. Documentación
+
+Genera un README.md que explique:
+
+* Arquitectura del proyecto.
+* Tecnologías y versiones seleccionadas.
+* Requisitos para compilar y ejecutar.
+* Variables de entorno.
+* Configuración de MongoDB y Kafka.
+* Cómo ejecutar la aplicación localmente.
+* Cómo ejecutar las pruebas.
+* Cómo comprobar la salud de la aplicación.
+* Cómo están organizados los paquetes.
+* Qué elementos son provisionales y deben sustituirse al definir el dominio.
+
+Incluye ejemplos mínimos de mensajes Kafka únicamente para demostrar la infraestructura. Identifícalos como ejemplos técnicos, no como contratos funcionales definitivos.
+
+# 10. Restricciones de esta primera fase
+
+No desarrolles todavía las reglas de negocio.
+
+No inventes el modelo de dominio definitivo.
+
+No presupongas nombres de entidades, atributos, colecciones o índices definitivos.
+
+No añadas una API REST para realizar las operaciones CRUD: la entrada funcional de este microservicio debe ser Kafka. Los endpoints técnicos de Actuator sí están permitidos.
+
+No añadas una interfaz gráfica.
+
+No añadas autenticación de negocio, autorización, integración con servicios externos ni otros componentes que no se hayan solicitado.
+
+No crees infraestructura adicional con Docker Compose. El entorno de MongoDB y Kafka ya existe.
+
+No actualices ni modifiques los contenedores existentes.
+
+No sustituyas dependencias por alternativas menos adecuadas sin explicar el motivo.
+
+# 11. Forma de trabajo
+
+Antes de generar el código:
+
+1. Comprueba las versiones estables y la compatibilidad entre las dependencias.
+2. Propón la estructura de paquetes y los componentes principales.
+3. Explica brevemente las decisiones arquitectónicas relevantes, especialmente el patrón de petición-respuesta sobre Kafka.
+4. Identifica qué partes deben permanecer provisionales hasta que se especifique el dominio.
+
+Después, implementa el proyecto completo en el espacio de trabajo actual.
+
+Crea los archivos necesarios, no te limites a mostrar fragmentos de código en el chat.
+
+Al finalizar:
+
+1. Compila el proyecto.
+2. Ejecuta las pruebas que puedan realizarse en el entorno disponible.
+3. Corrige los errores de compilación o de configuración detectados.
+4. Comprueba que las versiones declaradas son compatibles.
+5. Resume los archivos creados, las decisiones tomadas y los pasos necesarios para ejecutar el microservicio.
+
+Si alguna decisión funcional imprescindible no puede resolverse sin inventar requisitos, deja una interfaz o implementación provisional claramente documentada y continúa con el resto de la infraestructura.

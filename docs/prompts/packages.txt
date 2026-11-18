@@ -1,0 +1,49 @@
+Cambiame todo esto, la paquetería del proyecto debe seguir este estandar de paquetes, también es necesario renombrear clases y mover clases:
+
+Paquetería proyecto:
+src
+   main
+        java
+             com.gtech.automaticbroker.managedatabase
+                config
+                service
+                    impl
+                domain
+                    repository
+                    entity
+                kafka
+                    entity
+                    consumer
+                    producer
+                util
+                    exception
+                    observability
+
+Descripción paquetes
+
+config
+    Todas las clases de confioguración del proyecto, como la configuración de Kafka, base de datos, etc.
+    si es necesario crear un subpaquete para meter algo que afecte a configuración, se añade a ese paquete. Cor ejemplo properties
+service
+    Todas las clases de servicio del proyecto, que contienen la lógica de negocio.
+    En la carpeta service iran los interfaces
+    en la carpeta impl iran las implementaciones de los servicios.
+        Las implementaciones deben tener el mismo nombre que el interfaz pero añadiendo Impl al final del nombre. Por ejemplo, si el interfaz se llama UserService, la implementación se llamará UserServiceImpl.
+domain
+   Todas las clases de dominio del proyecto, que representan los objetos del negocio.
+   Todo lo que se refiere a BBDD
+   en repository iran las interfaces de los repositorios, que extienden de JpaRepository o CrudRepository.
+    en entity iran las clases que representan las entidades de la base de datos, que deben estar
+    anotadas con @Entity y tener un id que sea la clave primaria de la tabla.
+kafka
+    Todas las clases relacionadas con Kafka, como los consumidores y productores de mensajes.
+    en entity iran las clases que representan los mensajes que se envían y reciben por Kafka.
+    en consumer iran las clases que consumen los mensajes de Kafka, que deben estar anotadas
+    en producer iran las clases que producen los mensajes de Kafka, que deben estar anotadas con @Component.
+util
+    Todas las clases utilitarias del proyecto, como las excepciones personalizadas y las clases
+    Cualquier cosa que no encaje en los otros paquetes, se puede meter en util.
+    si hay que crear un para separar se crea.
+    EN exception iran las clases de excepciones personalizadas, que deben extender de RuntimeException.
+    en observability iran las clases relacionadas con la observabilidad del proyecto, como los interceptores de logs, métricas, etc.
+La clase que contendrá el main se llamará Application.java y estará en el paquete com.gtech.automaticbroker.managedatabase.

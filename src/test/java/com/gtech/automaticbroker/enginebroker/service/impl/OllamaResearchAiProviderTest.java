@@ -2,6 +2,7 @@ package com.gtech.automaticbroker.enginebroker.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -14,10 +15,13 @@ import com.gtech.automaticbroker.enginebroker.util.exception.AiProviderUnavailab
 import com.gtech.automaticbroker.enginebroker.util.exception.InvalidAiResponseException;
 import java.net.ConnectException;
 import java.time.Duration;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.ollama.api.OllamaChatOptions;
 import tools.jackson.databind.json.JsonMapper;
 
 class OllamaResearchAiProviderTest {
@@ -30,6 +34,7 @@ class OllamaResearchAiProviderTest {
         ChatClient.CallResponseSpec responseSpec = mock(ChatClient.CallResponseSpec.class);
         when(builder.build()).thenReturn(chatClient);
         when(chatClient.prompt()).thenReturn(requestSpec);
+        when(requestSpec.options(any())).thenReturn(requestSpec);
         when(requestSpec.system("system instructions")).thenReturn(requestSpec);
         when(requestSpec.user("user prompt")).thenReturn(requestSpec);
         when(requestSpec.call()).thenReturn(responseSpec);
@@ -45,6 +50,12 @@ class OllamaResearchAiProviderTest {
             assertThat(provider.providerName()).isEqualTo("ollama");
             assertThat(provider.modelName()).isEqualTo("test-model");
             assertThat(result.summary()).isEqualTo("Cautious result");
+            ArgumentCaptor<OllamaChatOptions.Builder> optionsCaptor =
+                    ArgumentCaptor.forClass(OllamaChatOptions.Builder.class);
+            verify(requestSpec).options(optionsCaptor.capture());
+            Object outputSchema = optionsCaptor.getValue().build().getFormat();
+            assertThat(outputSchema).isInstanceOf(Map.class);
+            assertThat(((Map<?, ?>) outputSchema).get("type")).isEqualTo("object");
             verify(requestSpec).system("system instructions");
             verify(requestSpec).user("user prompt");
         }
@@ -70,6 +81,7 @@ class OllamaResearchAiProviderTest {
         ChatClient.CallResponseSpec responseSpec = mock(ChatClient.CallResponseSpec.class);
         when(builder.build()).thenReturn(chatClient);
         when(chatClient.prompt()).thenReturn(requestSpec);
+        when(requestSpec.options(any())).thenReturn(requestSpec);
         when(requestSpec.system("system")).thenReturn(requestSpec);
         when(requestSpec.user("user")).thenReturn(requestSpec);
         when(requestSpec.call()).thenReturn(responseSpec);
@@ -86,6 +98,7 @@ class OllamaResearchAiProviderTest {
         ChatClient.CallResponseSpec responseSpec = mock(ChatClient.CallResponseSpec.class);
         when(builder.build()).thenReturn(chatClient);
         when(chatClient.prompt()).thenReturn(requestSpec);
+        when(requestSpec.options(any())).thenReturn(requestSpec);
         when(requestSpec.system("system")).thenReturn(requestSpec);
         when(requestSpec.user("user")).thenReturn(requestSpec);
         when(requestSpec.call()).thenReturn(responseSpec);
@@ -102,6 +115,7 @@ class OllamaResearchAiProviderTest {
         ChatClient.CallResponseSpec responseSpec = mock(ChatClient.CallResponseSpec.class);
         when(builder.build()).thenReturn(chatClient);
         when(chatClient.prompt()).thenReturn(requestSpec);
+        when(requestSpec.options(any())).thenReturn(requestSpec);
         when(requestSpec.system("system")).thenReturn(requestSpec);
         when(requestSpec.user("user")).thenReturn(requestSpec);
         when(requestSpec.call()).thenReturn(responseSpec);

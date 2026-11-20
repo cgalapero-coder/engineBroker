@@ -53,7 +53,7 @@ El listener adapta transporte y delega en `OperationService`; `OperationServiceI
 - El listener solo publica una respuesta cuando `responseRequired=true`. La entrega Kafka es al menos una vez, con confirmación por registro, reintentos fijos y enrutamiento a DLT; no hay garantía exactly-once. `IdempotencyStore` solo existe como interfaz/puerto: no hay implementación, uso ni deduplicación persistente activa.
 - No afirmar que existen transacciones distribuidas entre Kafka y MongoDB. Si una futura regla de negocio necesita atomicidad entre guardar y emitir eventos, acordar primero el patrón y sus garantías (por ejemplo, outbox/inbox).
 - Permanecen abiertos: límites y reglas de negocio, versionado del contrato, tipado de los campos flexibles, índices/consultas de negocio, política de idempotencia, seguridad/autorización y compatibilidad definitiva del formato de serialización Kafka.
-- El perfil `local` usa `JsonSerializer`/`JsonDeserializer`, mientras que el listener de negocio recibe `String` y el perfil base configura serializadores/deserializadores de String. Antes de que productores externos dependan de ello, acordar y probar el formato real del mensaje; [`configuracion-kafka-local.md`](../configuracion-kafka-local.md) describe la discrepancia conocida.
+- El perfil `local` usa `JsonSerializer` para las peticiones y conserva `StringDeserializer` para consumir respuestas JSON como texto; el cliente las convierte explícitamente al envelope de respuesta. Los productores externos deben publicar objetos JSON sin escapar; consultar [`configuracion-kafka-local.md`](../configuracion-kafka-local.md).
 
 ## Operación y pruebas
 

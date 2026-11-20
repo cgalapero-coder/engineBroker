@@ -19,7 +19,7 @@ Implementa únicamente la tarea concreta proporcionada por el agente coordinador
 - No introduzcas secretos ni fuerces versiones que Spring Boot gestione.
 - Preserva las responsabilidades por paquete y el comportamiento `responseRequired`: las solicitudes con respuesta reciben un resultado correlacionado y los eventos que no requieren respuesta no deben publicar una.
 - No afirmes entrega exactamente una vez ni idempotencia persistente; la entrega actual es al menos una vez y `IdempotencyStore` solo es un puerto sin implementación ni uso en el flujo.
-- No asumas un formato Kafka compatible con cualquier productor: el perfil `local` usa serializadores JSON mientras que el listener recibe `String`; verifica el contrato en la configuración activa y en `../../configuracion-kafka-local.md`.
+- No asumas un formato Kafka compatible con cualquier productor: el listener de respuestas recibe texto JSON mediante `StringDeserializer` y el cliente interpreta el envelope; verifica el contrato en la configuración activa y en `../../configuracion-kafka-local.md`.
 - Haz cambios acotados, con tipos claros, errores explícitos y pruebas para el comportamiento afectado.
 
 ## Salida requerida

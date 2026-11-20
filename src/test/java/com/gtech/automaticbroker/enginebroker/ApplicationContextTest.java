@@ -7,6 +7,7 @@ import com.gtech.automaticbroker.enginebroker.kafka.producer.ManageDatabaseClien
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.env.Environment;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -24,6 +25,9 @@ class ApplicationContextTest {
     @Autowired
     private KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
 
+    @Autowired
+    private Environment environment;
+
     @MockitoBean
     private ManageDatabaseClient manageDatabaseClient;
 
@@ -33,5 +37,11 @@ class ApplicationContextTest {
         assertThat(kafkaListenerEndpointRegistry.getListenerContainers())
                 .isNotEmpty()
                 .allSatisfy(container -> assertThat(container.isRunning()).isTrue());
+    }
+
+    @Test
+    void usesStringDeserializerForJsonResponseValues() {
+        assertThat(environment.getProperty("spring.kafka.consumer.value-deserializer"))
+                .isEqualTo("org.apache.kafka.common.serialization.StringDeserializer");
     }
 }

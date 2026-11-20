@@ -12,8 +12,3 @@ spring:
         spring.json.add.type.headers: true
     consumer:
       group-id: ${KAFKA_CONSUMER_GROUP:${spring.application.name}-local}
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-      properties:
-        spring.json.value.default.type: java.lang.String
-        spring.json.use.type.headers: true
-        spring.json.trusted.packages: java.lang

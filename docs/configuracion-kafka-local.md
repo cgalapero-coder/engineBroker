@@ -19,10 +19,10 @@ Esta configuración no modifica Docker, el broker ni Kafka UI.
 - Productor: `StringSerializer` para la clave, `JsonSerializer` para el
   valor y `acks: all`.
 - Consumidor: group ID `${spring.application.name}-local`
-  (`manageDatabase-local`), `auto-offset-reset: earliest`,
-  `enable-auto-commit: false`, `StringDeserializer` para la clave y
-  `JsonDeserializer` para el valor.
-- Paquetes JSON de confianza: `com.gtech.automaticbroker.managedatabase.kafka.entity`.
+  (`engineBroker-local`), `auto-offset-reset: earliest`,
+  `enable-auto-commit: false`, `StringDeserializer` para clave y valor. El
+  listener interpreta explícitamente el valor JSON como una respuesta de
+  `manageDatabase`.
 - Confirmación de listeners: `record`.
 
 El perfil predeterminado está definido como `local` en
@@ -52,22 +52,18 @@ No se añadió ninguna dependencia: `pom.xml` ya incluye
 `spring-boot-starter-kafka`, que aporta Spring Kafka. La versión la gestiona
 Spring Boot mediante el parent del proyecto; no se fijó una versión adicional.
 
-## Compatibilidad pendiente
+## Formato de los mensajes
 
-El listener actual (`KafkaRequestListener`) recibe `String` y
-`KafkaMessageCodec` interpreta el valor como un objeto JSON serializado. El
-`JsonDeserializer` de Spring Kafka normalmente necesita metadatos de tipo
-Spring en el mensaje o un tipo predeterminado configurado; los productores
-externos que envíen JSON crudo sin esos metadatos pueden no ser compatibles
-con este perfil. Asimismo, `JsonSerializer` serializa el valor `String` como
-JSON, lo que puede cambiar la forma del mensaje en el cable. La configuración
-solicitada se limita al perfil local y no se cambió la lógica funcional.
+El consumidor convierte los bytes del valor Kafka a `String` y el cliente de
+`manageDatabase` interpreta esa cadena como JSON. Por tanto, las respuestas
+deben publicarse como objetos JSON (por ejemplo, `{...}`), no como objetos
+JSON serializados como una cadena escapada (`"{...}"`). La deserialización no
+depende de cabeceras de tipo de Spring Kafka.
 
-Antes de usar estos serializadores con productores externos, hay que acordar
-el contrato de serialización (incluidos los metadatos de tipo) o adaptar
-conjuntamente el consumidor y los productores. Los eventos se decodifican
-actualmente de forma explícita con `KafkaMessageCodec`; si se implementa
-deserialización directa de DTO/eventos con Spring Kafka, se deben revisar y
-restringir los paquetes de confianza a sus paquetes concretos.
+El productor de esta aplicación usa `JsonSerializer` para publicar los
+envelopes de petición como objetos JSON. Coordina el formato JSON con los
+productores externos y evita configurar `JsonDeserializer` para las respuestas:
+ese deserializador espera un valor compatible con el tipo Java configurado y
+falla si recibe un objeto JSON cuando el listener espera una cadena.
 
 La aplicación no requiere credenciales Kafka para esta infraestructura local.

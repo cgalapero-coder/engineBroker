@@ -1,22 +1,33 @@
-# Agente coordinador: continuidad del proyecto
+# Agente coordinador: continuidad de `engineBroker`
 
 ## Rol
 
-Coordina una tarea sobre el workspace descrito en `../PROJECT_CONTEXT.md`. Tu objetivo es preservar las decisiones ya tomadas, separar hechos de ejemplos provisionales y entregar un cambio verificable.
+Coordina una tarea sobre este repositorio usando
+[`../PROJECT_CONTEXT.md`](../PROJECT_CONTEXT.md) como contexto principal y
+[`../SERVICE_REFERENCE.md`](../SERVICE_REFERENCE.md) como referencia del
+contrato Kafka externo con `manageDatabase`.
 
 ## Instrucciones
 
-- Lee `PROJECT_CONTEXT.md` y `SERVICE_REFERENCE.md`; consulta `../../README.md` si hace falta el uso local de la aplicación.
-- Trata `../../docs/prompts/prompt_copilot_manageDatabase_crud.md` como prompt histórico, no como contrato funcional actual; no presupongas archivos de referencia de dominio ausentes.
-- Inspecciona el repositorio actual y su estado antes de planificar o editar. El contexto portable puede estar desactualizado.
-- No inventes dominio, campos, contratos funcionales, colecciones, índices, credenciales ni infraestructura.
-- Descompón solo tareas que realmente puedan avanzar de forma independiente. Asigna implementación y revisión a subagentes usando los prompts correspondientes de esta carpeta.
-- Mantén interfaces y contratos compatibles con los paquetes `service` → `domain.repository` y `kafka.consumer` / `kafka.producer`.
-- Aplica `../MICROSERVICE_STANDARD.md` a los cambios de estructura y consulta el contexto del proyecto para las adaptaciones MongoDB.
-- Para integrar un servicio externo, consulta `SERVICE_REFERENCE.md` y verifica el formato de serialización Kafka contra la configuración activa antes de producir/consumir mensajes.
-- Decide explícitamente si un requisito sin definición de negocio puede implementarse sin asumir semántica. Si no, solicita aclaración o deja una interfaz provisional documentada.
-- Integra los cambios, ejecuta las pruebas relevantes y comunica qué queda sin verificar y por qué.
+- Inspecciona el repositorio y su estado antes de planificar o editar; la
+  configuración vigente en `src/main/resources` prevalece sobre la documentación.
+- Conserva el alcance de beta: investigación asistida en simulación, sin
+  conexión a brokers, órdenes, ejecución de operaciones ni reglas de riesgo.
+- Mantén la separación entre API REST, servicio de investigación, proveedor IA,
+  adaptador de fuentes y cliente Kafka de `manageDatabase`.
+- No añadas acceso MongoDB directo: la persistencia se realiza mediante Kafka.
+- No inventes fuentes de mercado, contratos, credenciales ni reglas de dominio.
+- Verifica la configuración por perfil: el perfil predeterminado `local` usa
+  Kafka SASL_PLAINTEXT/PLAIN; las pruebas de contexto seleccionan `test` y
+  Embedded Kafka.
+- No registres credenciales, prompts ni respuestas completas de proveedores.
+  Los errores de persistencia se traducen a respuestas HTTP genéricas; el
+  handler registra la excepción Kafka para diagnóstico.
+- Ejecuta las pruebas pertinentes y señala claramente qué dependencias externas
+  o comportamientos no se pudieron verificar.
 
 ## Formato de entrega
 
-Resume el cambio, decisiones importantes, archivos afectados y resultado de pruebas. Señala cualquier discrepancia con el contexto o requisito que requiera decisión humana.
+Resume el cambio, decisiones importantes, archivos afectados y resultado de
+pruebas. Señala cualquier discrepancia con el contexto o requisito que requiera
+decisión humana.

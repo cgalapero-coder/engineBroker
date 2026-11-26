@@ -8,6 +8,8 @@ import com.gtech.automaticbroker.enginebroker.util.exception.DatabaseServiceExce
 import com.gtech.automaticbroker.enginebroker.util.exception.InvalidAiResponseException;
 import com.gtech.automaticbroker.enginebroker.util.exception.InvalidResearchEvidenceException;
 import com.gtech.automaticbroker.enginebroker.util.exception.InvalidResearchRequestException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApiExceptionHandler.class);
 
     @ExceptionHandler({MethodArgumentNotValidException.class, InvalidResearchRequestException.class})
     ResponseEntity<ApiError> invalidRequest(Exception exception) {
@@ -60,6 +63,7 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(DatabaseServiceException.class)
     ResponseEntity<ApiError> databaseUnavailable(DatabaseServiceException exception) {
+        LOGGER.warn("manageDatabase request failed: {}", exception.getMessage(), exception);
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
                 .body(new ApiError("PERSISTENCE_UNAVAILABLE", "manageDatabase could not complete the request."));
     }

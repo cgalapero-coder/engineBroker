@@ -1,6 +1,10 @@
-# Referencia de integración: `manageDatabase`
+# Referencia externa de integración: `manageDatabase`
 
-Referencia portátil para agentes que necesiten integrar otro microservicio con esta aplicación. Describe lo que implementa el código actual; no convierte el CRUD técnico en un contrato de negocio estable.
+Referencia del contrato Kafka de `manageDatabase` que consume `engineBroker`.
+Describe lo conocido sobre el servicio externo y no documenta la implementación
+interna de este repositorio. Verifica los detalles contra el código de
+`manageDatabase` antes de cambiar contratos; esta referencia no convierte su
+CRUD técnico en un contrato de negocio estable.
 
 ## Identidad y dependencias
 

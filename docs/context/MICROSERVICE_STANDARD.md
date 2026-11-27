@@ -59,6 +59,19 @@ No anotes entidades Mongo con `@Entity` ni uses `JpaRepository` sobre MongoDB. M
 
 ## Aplicación en este workspace
 
-`manageDatabase` usa MongoDB: conserva `@Document`/`@Id`, MongoTemplate y Spring Data Mongo; no añadas JPA ni anotes sus documentos con `@Entity`. Extiende `CrudDocument` para las siete colecciones Automatic Broker cuando el cambio pertenezca a ese mapa. El CRUD de aplicación Kafka implementa `CREATE`, `GET`, `UPDATE` y `DELETE`; `GET_MANY` no está soportado por el dispatcher. La implementación CRUD es scaffolding técnico, no reglas funcionales confirmadas. La descripción completa del contrato vigente, topics, perfiles, campos de entidad y pruebas está en [`SERVICE_REFERENCE.md`](SERVICE_REFERENCE.md).
+`engineBroker` es una aplicación REST de investigación asistida, no el servicio
+CRUD `manageDatabase`. Mantén las responsabilidades actuales: API en `api`,
+casos de uso en `service` / `service.impl`, proveedor de IA detrás de
+`ResearchAiProvider` y el adaptador Kafka a `manageDatabase` en
+`kafka.producer` / `kafka.consumer`. No añadas persistencia Mongo local ni
+dependencias directas de base de datos: el almacenamiento se solicita por Kafka.
+La beta solo funciona en modo simulación y no debe enviar órdenes ni inferir
+reglas de inversión.
 
-La carpeta `docs/prompts/` contiene un prompt histórico de implementación (`prompt_copilot_manageDatabase_crud.md`), no un contrato vigente que prevalezca sobre el código. Antes de integrar un consumidor externo, verifica también la diferencia de serialización entre `application.yml` y `application-local.yml` descrita en `docs/configuracion-kafka-local.md`. No se garantiza exactamente una vez ni hay deduplicación persistente activa.
+La referencia del contrato externo Kafka está en
+[`SERVICE_REFERENCE.md`](SERVICE_REFERENCE.md). El archivo
+`docs/prompts/prompt_copilot_manageDatabase_crud.md` es histórico y no describe
+la implementación de este repositorio. Verifica siempre la configuración activa
+en `application.yml` y `application-local.yml`; en particular, `local` usa
+SASL_PLAINTEXT/PLAIN y la prueba de contexto selecciona explícitamente el perfil
+`test` para usar Embedded Kafka.

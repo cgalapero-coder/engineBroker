@@ -217,7 +217,7 @@ Formatting metadata directory C:\Users\cgala\AppData\Local\Temp\kafka-3466877661
 2026-11-19T09:23:56.855+01:00  INFO [corr:] 24728 --- [engineBroker] [ent-processor-3] eadedEventProcessor$EventProcessorThread : [group-coordinator-event-processor-3]: Starting
 2026-11-19T09:23:56.856+01:00  INFO [corr:] 24728 --- [engineBroker] [r-event-handler] k.server.ControllerRegistrationManager   : [ControllerRegistrationManager id=0 incarnation=3xlxswovRcCXAitvLDePsw] sendControllerRegistration: attempting to send ControllerRegistrationRequestData(controllerId=0, incarnationId=3xlxswovRcCXAitvLDePsw, zkMigrationReady=false, listeners=[Listener(name='CONTROLLER', host='localhost', port=60489, securityProtocol=0)], features=[Feature(name='group.version', minSupportedVersion=0, maxSupportedVersion=1), Feature(name='kraft.version', minSupportedVersion=0, maxSupportedVersion=1), Feature(name='metadata.version', minSupportedVersion=7, maxSupportedVersion=30), Feature(name='share.version', minSupportedVersion=0, maxSupportedVersion=1), Feature(name='streams.version', minSupportedVersion=0, maxSupportedVersion=1), Feature(name='transaction.version', minSupportedVersion=0, maxSupportedVersion=2), Feature(name='eligible.leader.replicas.version', minSupportedVersion=0, maxSupportedVersion=1)])
 2026-11-19T09:23:56.858+01:00  INFO [corr:] 24728 --- [engineBroker] [r-event-handler] k.s.metadata.DynamicConfigPublisher      : [DynamicConfigPublisher controller id=0] Updating cluster configuration : min.insync.replicas -> 1
-2026-11-19T09:23:56.867+01:00  INFO [corr:] 24728 --- [engineBroker] [r-event-handler] o.a.kafka.common.config.AbstractConfig   : KafkaConfig values: 
+2026-11-19T09:23:56.867+01:00  INFO [corr:] 24728 --- [engineBroker] [r-event-handler] o.a.kafka.common.config.AbstractConfig   : KafkaConfig values:
 	add.partitions.to.txn.retry.backoff.max.ms = 100
 	add.partitions.to.txn.retry.backoff.ms = 20
 	advertised.listeners = null
@@ -601,7 +601,7 @@ Formatting metadata directory C:\Users\cgala\AppData\Local\Temp\kafka-3466877661
 2026-11-19T09:23:57.074+01:00  INFO [corr:] 24728 --- [engineBroker] [r-event-handler] o.a.k.c.share.ShareCoordinatorService    : [ShareCoordinator id=0] Starting up.
 2026-11-19T09:23:57.074+01:00  INFO [corr:] 24728 --- [engineBroker] [r-event-handler] o.a.k.c.share.ShareCoordinatorService    : [ShareCoordinator id=0] Startup complete.
 2026-11-19T09:23:57.083+01:00  INFO [corr:] 24728 --- [engineBroker] [r-event-handler] k.s.metadata.DynamicConfigPublisher      : [DynamicConfigPublisher broker id=0] Updating cluster configuration : min.insync.replicas -> 1
-2026-11-19T09:23:57.086+01:00  INFO [corr:] 24728 --- [engineBroker] [r-event-handler] o.a.kafka.common.config.AbstractConfig   : KafkaConfig values: 
+2026-11-19T09:23:57.086+01:00  INFO [corr:] 24728 --- [engineBroker] [r-event-handler] o.a.kafka.common.config.AbstractConfig   : KafkaConfig values:
 	add.partitions.to.txn.retry.backoff.max.ms = 100
 	add.partitions.to.txn.retry.backoff.ms = 20
 	advertised.listeners = null
@@ -952,7 +952,7 @@ Formatting metadata directory C:\Users\cgala\AppData\Local\Temp\kafka-3466877661
 2026-11-19T09:23:57.117+01:00  INFO [corr:] 24728 --- [engineBroker] [ster-test-kit-4] kafka.server.BrokerServer                : [BrokerServer id=0] Finished waiting for the controller to acknowledge that we are caught up
 2026-11-19T09:23:57.117+01:00  INFO [corr:] 24728 --- [engineBroker] [ster-test-kit-4] kafka.server.BrokerServer                : [BrokerServer id=0] Waiting for the initial broker metadata update to be published
 2026-11-19T09:23:57.117+01:00  INFO [corr:] 24728 --- [engineBroker] [ster-test-kit-4] kafka.server.BrokerServer                : [BrokerServer id=0] Finished waiting for the initial broker metadata update to be published
-2026-11-19T09:23:57.119+01:00  INFO [corr:] 24728 --- [engineBroker] [ster-test-kit-4] o.a.kafka.common.config.AbstractConfig   : KafkaConfig values: 
+2026-11-19T09:23:57.119+01:00  INFO [corr:] 24728 --- [engineBroker] [ster-test-kit-4] o.a.kafka.common.config.AbstractConfig   : KafkaConfig values:
 	add.partitions.to.txn.retry.backoff.max.ms = 100
 	add.partitions.to.txn.retry.backoff.ms = 20
 	advertised.listeners = null
@@ -1308,7 +1308,7 @@ Formatting metadata directory C:\Users\cgala\AppData\Local\Temp\kafka-3466877661
 2026-11-19T09:23:57.165+01:00  INFO [corr:] 24728 --- [engineBroker] [ster-test-kit-4] kafka.server.BrokerServer                : [BrokerServer id=0] Waiting for all of the SocketServer Acceptors to be started
 2026-11-19T09:23:57.165+01:00  INFO [corr:] 24728 --- [engineBroker] [ster-test-kit-4] kafka.server.BrokerServer                : [BrokerServer id=0] Finished waiting for all of the SocketServer Acceptors to be started
 2026-11-19T09:23:57.167+01:00  INFO [corr:] 24728 --- [engineBroker] [ster-test-kit-4] kafka.server.BrokerServer                : [BrokerServer id=0] Transition from STARTING to STARTED
-2026-11-19T09:23:57.191+01:00  INFO [corr:] 24728 --- [engineBroker] [           main] o.a.kafka.common.config.AbstractConfig   : AdminClientConfig values: 
+2026-11-19T09:23:57.191+01:00  INFO [corr:] 24728 --- [engineBroker] [           main] o.a.kafka.common.config.AbstractConfig   : AdminClientConfig values:
 	bootstrap.controllers = []
 	bootstrap.servers = [localhost:60490]
 	client.dns.lookup = use_all_dns_ips
@@ -1428,7 +1428,7 @@ Formatting metadata directory C:\Users\cgala\AppData\Local\Temp\kafka-3466877661
 2026-11-19T09:24:01.409+01:00  INFO [corr:] 24728 --- [engineBroker] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
 2026-11-19T09:24:01.410+01:00  INFO [corr:] 24728 --- [engineBroker] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.27]
 2026-11-19T09:24:01.586+01:00  INFO [corr:] 24728 --- [engineBroker] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 4133 ms
-2026-11-19T09:24:02.930+01:00  INFO [corr:] 24728 --- [engineBroker] [           main] o.a.kafka.common.config.AbstractConfig   : AdminClientConfig values: 
+2026-11-19T09:24:02.930+01:00  INFO [corr:] 24728 --- [engineBroker] [           main] o.a.kafka.common.config.AbstractConfig   : AdminClientConfig values:
 	bootstrap.controllers = []
 	bootstrap.servers = [localhost:60490]
 	client.dns.lookup = use_all_dns_ips
@@ -1526,7 +1526,7 @@ Formatting metadata directory C:\Users\cgala\AppData\Local\Temp\kafka-3466877661
 2026-11-19T09:24:02.939+01:00  INFO [corr:] 24728 --- [engineBroker] [           main] o.a.kafka.common.utils.AppInfoParser     : Kafka startTimeMs: 1795076642939
 2026-11-19T09:24:03.872+01:00  INFO [corr:] 24728 --- [engineBroker] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 3 endpoints beneath base path '/actuator'
 2026-11-19T09:24:04.044+01:00  INFO [corr:] 24728 --- [engineBroker] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 60499 (http) with context path '/'
-2026-11-19T09:24:04.093+01:00  INFO [corr:] 24728 --- [engineBroker] [           main] o.a.kafka.common.config.AbstractConfig   : ConsumerConfig values: 
+2026-11-19T09:24:04.093+01:00  INFO [corr:] 24728 --- [engineBroker] [           main] o.a.kafka.common.config.AbstractConfig   : ConsumerConfig values:
 	allow.auto.create.topics = true
 	auto.commit.interval.ms = 5000
 	auto.offset.reset = earliest

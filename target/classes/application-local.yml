@@ -1,6 +1,6 @@
 server:
-  address: ${SERVER_ADDRESS:127.0.0.1}
-  port: ${SERVER_PORT:8092}
+    address: ${SERVER_ADDRESS:127.0.0.1}
+    port: ${SERVER_PORT:8092}
 
 spring:
   kafka:
@@ -12,3 +12,9 @@ spring:
         spring.json.add.type.headers: true
     consumer:
       group-id: ${KAFKA_CONSUMER_GROUP:${spring.application.name}-local}
+    kafka:
+        bootstrap-servers: localhost:30094
+        properties:
+            security.protocol: SASL_PLAINTEXT
+            sasl.mechanism: PLAIN
+            sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="${KAFKA_USERNAME:appuser}" password="${KAFKA_PASSWORD}";

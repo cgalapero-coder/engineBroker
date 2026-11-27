@@ -4,18 +4,21 @@ spring:
   profiles:
     default: local
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
-    consumer:
-      group-id: engineBroker-local
-      auto-offset-reset: earliest
-      enable-auto-commit: false
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9094}
+
+    properties:
+      security.protocol: SASL_PLAINTEXT
+      sasl.mechanism: PLAIN
+      sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="${KAFKA_USERNAME:appuser}" password="${KAFKA_PASSWORD}";
+
     producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-    listener:
-      ack-mode: record
+      acks: all
+      properties:
+        spring.json.add.type.headers: true
+
+    consumer:
+      group-id: ${KAFKA_CONSUMER_GROUP:${spring.application.name}-local}
   ai:
     ollama:
       base-url: ${OLLAMA_BASE_URL:http://localhost:11434}

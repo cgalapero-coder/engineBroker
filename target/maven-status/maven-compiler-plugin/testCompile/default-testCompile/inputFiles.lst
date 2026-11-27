@@ -1,7 +1,0 @@
-/Users/carlos.galapero/workspaces/engineBroker/src/test/java/com/gtech/automaticbroker/enginebroker/ApplicationContextTest.java
-/Users/carlos.galapero/workspaces/engineBroker/src/test/java/com/gtech/automaticbroker/enginebroker/config/ResearchAiProviderConfigurationTest.java
-/Users/carlos.galapero/workspaces/engineBroker/src/test/java/com/gtech/automaticbroker/enginebroker/kafka/producer/ManageDatabaseClientTest.java
-/Users/carlos.galapero/workspaces/engineBroker/src/test/java/com/gtech/automaticbroker/enginebroker/service/impl/InvestmentResearchServiceImplTest.java
-/Users/carlos.galapero/workspaces/engineBroker/src/test/java/com/gtech/automaticbroker/enginebroker/service/impl/OllamaResearchAiProviderTest.java
-/Users/carlos.galapero/workspaces/engineBroker/src/test/java/com/gtech/automaticbroker/enginebroker/service/impl/ResearchPromptBuilderTest.java
-/Users/carlos.galapero/workspaces/engineBroker/src/test/java/com/gtech/automaticbroker/enginebroker/service/impl/ResearchResultNormalizerTest.java

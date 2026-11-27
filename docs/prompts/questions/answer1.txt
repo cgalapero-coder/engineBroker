@@ -1,0 +1,242 @@
+Revisión funcional y técnica de POST /api/v1/research
+
+Referencias usadas: petición market=EU, instrument=SAP, objective="Resume las hipótesis que puedan investigarse para este instrumento.", simulation=true.
+
+1. Recorrido de clases y responsabilidades
+
+- ResearchController.research(), en api/ResearchController.java, recibe el POST, valida el cuerpo con @Valid y delega en InvestmentResearchService.investigate(). Devuelve siempre HTTP 200 con el cuerpo cuando la operación termina correctamente. ResearchRequest tiene las restricciones de campos; en particular, simulation debe ser true.
+
+- ResearchRequest, en domain/entity/ResearchRequest.java, contiene market, instrument, objective, userId, userRole y simulation.
+
+- InvestmentResearchServiceImpl.investigate(), en service/impl/InvestmentResearchServiceImpl.java, es el orquestador principal. Valida el modo de simulación, crea un UUID de ejecución, registra el inicio en histData, recoge evidencia, la valida, construye la petición al modelo, solicita el resultado, normaliza la respuesta, intenta persistir la evidencia verificable en biData y actualiza histData con el resultado o el fallo.
+
+- NoExternalResearchSourceAdapter.collect(), en service/impl/NoExternalResearchSourceAdapter.java, implementa ResearchSourceAdapter y actualmente devuelve siempre List.of(); no realiza llamadas HTTP, búsquedas ni consultas de mercado.
+
+- ResearchPromptBuilder.build(), en service/impl/ResearchPromptBuilder.java, carga el prompt de sistema desde src/main/resources/prompts/instrument-research-system.md y crea un ResearchAiRequest con el prompt de sistema y un JSON de usuario generado por ObjectMapper.
+
+- OllamaResearchAiProvider.research(), en service/impl/OllamaResearchAiProvider.java, ejecuta la llamada a Ollama mediante Spring AI ChatClient, añade las opciones de Ollama y el JSON Schema esperado, aplica timeout y convierte el contenido recibido en ResearchAiResponse.
+
+- ResearchResultNormalizer.filterVerifiedEvidence(), filterVerifiedEvidence(request, evidence) y normalize(), en service/impl/ResearchResultNormalizer.java, filtran evidencia, comprueban mercado e instrumento, eliminan referencias inválidas y añaden incertidumbres. No obtienen datos por sí mismos.
+
+- Ollama y manageDatabase son dependencias externas. Ollama se configura en application.yml; manageDatabase se comunica mediante Kafka usando ManageDatabaseClient, ManageDatabaseResponseListener y los sobres DatabaseRequestEnvelope/DatabaseResponseEnvelope.
+
+- ResearchResult, en domain/entity/ResearchResult.java, representa el objeto HTTP completo. Sus campos son executionId, status, summary, conclusions, evidence, uncertainties, simulation, historyPersisted, dataPersisted y persistedDataCount.
+
+- ApiExceptionHandler, en api/ApiExceptionHandler.java, transforma las excepciones de dominio y proveedores en respuestas de error HTTP. Esta clase no convierte una ejecución fallida en la respuesta COMPLETED.
+
+2. Información recibida por Ollama y prompt enviado
+
+Ollama recibe dos entradas creadas por OllamaResearchAiProvider.research():
+
+- systemPrompt: el contenido completo de instrument-research-system.md. Indica que debe actuar como asistente cauteloso de investigación, no dar asesoramiento ejecutable, devolver sólo JSON con summary, conclusions y uncertainties, distinguir hechos/hipótesis/predicciones y no inventar datos.
+
+- userPrompt: el JSON construido por ResearchPromptBuilder.build() a partir de este record interno:
+  {
+    "market": "EU",
+    "instrument": "SAP",
+    "objective": "Resume las hipótesis que puedan investigarse para este instrumento.",
+    "evidence": []
+  }
+
+El campo evidence contiene el resultado del adapter y, por tanto, está vacío en la ejecución descrita. No se envía como información adicional el userId, userRole, executionId, datos de Kafka ni información interna de persistencia. En OllamaChatOptions se establece además el JSON Schema RESEARCH_RESPONSE_SCHEMA para pedir al modelo exactamente summary, conclusions y uncertainties y limitar conclusion.category a FACT, INFERENCE, HYPOTHESIS o PREDICTION.
+
+3. Modelo de Ollama
+
+El modelo es el valor Spring de spring.ai.ollama.chat.options.model. Por defecto es llama3.2:3b, definido en application.yml como OLLAMA_MODEL con ese valor por defecto. Puede sustituirse mediante la variable de entorno OLLAMA_MODEL.
+
+El proveedor predeterminado es Ollama, determinado por app.research.ai.provider en application.yml y seleccionado por ResearchAiProviderConfiguration.selectedResearchAiProvider(). OllamaResearchAiProvider.modelName() devuelve el valor configurado. OllamaResearchAiProvider.providerName() devuelve "ollama".
+
+4. Consulta a fuentes externas
+
+No existe ninguna consulta externa en esta ejecución. NoExternalResearchSourceAdapter.collect(request) devuelve una lista vacía. Por ello:
+
+- Ollama no recibe mercado actual, cotizaciones, noticias, balances ni otros datos externos.
+- Ollama recibe sólo EU, SAP, el objetivo y evidence=[].
+- La respuesta del modelo debe basarse en su conocimiento y en el texto generado, pero no se puede verificar ni atribuir a una fuente externa desde este código.
+- El normalizador añade "No external data source is configured; market facts could not be independently verified." y persistEvidence() añade después "No verified data was available to persist to biData." si evidence sigue vacío.
+- El uncertainty reportado coincide con esta limitación.
+
+ResearchSourceAdapter es una interfaz preparada para una integración futura. No hay implementaciones externas reales más allá de NoExternalResearchSourceAdapter. Por tanto, no hay consulta a SAP, bolsa, Reuters, APIs REST, noticias u otros proveedores.
+
+5. Construcción y validación del objeto de respuesta
+
+OllamaResearchAiProvider.research():
+- ejecuta ChatClient.prompt().options(...).system(...).user(...).call().content() con el timeout app.research.ai-timeout;
+- rechaza respuesta nula o vacía;
+- deserializa el texto JSON en ResearchAiResponse.
+
+La deserialización comprende summary, conclusions y uncertainties. Después ResearchResultNormalizer.normalize():
+- exige que response no sea nulo y que summary, conclusions, uncertainties y suppliedEvidence no sean nulos;
+- exige summary no vacío;
+- elimina incertidumbres nulas/vacías y quita duplicados conservando el orden;
+- exige que cada conclusión tenga category, text, sourceIds y confidence;
+- conserva sólo sourceIds que correspondan a evidencia verificada;
+- si una conclusión FACT carece de fuentes o incluye una fuente desconocida, se omite y se registra una incertidumbre;
+- elimina referencias no soportadas de otras categorías y registra una incertidumbre;
+- recorta summary y textos;
+- si no hay evidencia verificada, añade la incertidumbre sobre ausencia de fuentes externas.
+
+filterVerifiedEvidence() sólo conserva elementos no nulos con verified=true y todos los campos obligatorios de procedencia: sourceId, sourceName, market, instrument, dataType, value y observedAt. filterVerifiedEvidence(request, suppliedEvidence) añade además que market e instrument coincidan, ignorando mayúsculas/minúsculas.
+
+Tras normalizar, InvestmentResearchServiceImpl.persistEvidence():
+- recorre sólo la evidencia verificada;
+- crea documentos en biData;
+- devuelve el número persistido.
+- si la lista está vacía, añade la incertidumbre de no haber datos que persistir.
+
+Finalmente, investiga() crea un nuevo ResearchResult con:
+- executionId generado;
+- status="COMPLETED";
+- summary y conclusiones normalizados;
+- evidence=normalized.verifiedEvidence();
+- uncertainties normalizadas;
+- simulation=true;
+- historyPersisted=true;
+- dataPersisted=false;
+- persistedDataCount=0.
+
+Normalmente, evidence=[] y persistedDataCount=0 son consistentes con NoExternalResearchSourceAdapter.
+
+La validación del JSON schema de Ollama es opcional en el proveedor: OllamaChatOptions.outputSchema(RESEARCH_RESPONSE_SCHEMA) solicita y configura una respuesta estructurada. La validación Java posterior es obligatoria en OllamaResearchAiProvider y ResearchResultNormalizer. No basta con que la clase tenga los campos adecuados: el normalizador comprueba valores requeridos y evidencia.
+
+6. Por qué se guarda en histData y no en biData
+
+El documento inicial se crea siempre en histData, si el endpoint está permitido y simulation=true. historyDocument() contiene:
+- actorType=USER o SYSTEM según userId;
+- userId y userRole, si existen;
+- eventType=INVESTIGATION_STARTED;
+- operationId=UUID de ejecución;
+- operation=INSTRUMENT_RESEARCH;
+- occurredAt;
+- simulationData, con los servicios "ollama" y "manageDatabase";
+- result="RUNNING";
+- descripción con market, instrument y objective.
+
+Esto se persiste con ManageDatabaseClient.create("histData", document).
+
+Después se llama a persistEvidence(). BiData está reservado a valores/evidencia verificable normalizada. Como NoExternalResearchSourceAdapter devuelve una lista vacía y no se introduce ninguna evidencia verificada, el bucle no crea documentos en biData. Por eso dataPersisted=false y persistedDataCount=0.
+
+Al terminar correctamente se usa databaseClient.update("histData", historyId, changes), no se crea una entrada biData adicional. El cambio contiene eventType=INVESTIGATION_COMPLETED, occurredAt, result con el ResearchResult serializado y una descripción.
+
+7. Mensajes Kafka enviados a manageDatabase
+
+Todos los mensajes salen por app.manage-database.request-topic, cuyo valor predeterminado es manageDatabase.requests. Se construyen mediante ManageDatabaseClient.execute().
+
+Cada DatabaseRequestEnvelope contiene:
+- messageId: UUID aleatorio;
+- correlationId: UUID aleatorio;
+- operation: CREATE o UPDATE;
+- payload;
+- responseRequired=true.
+
+Primer mensaje CREATE:
+- operation=CREATE
+- payload.collection="histData"
+- payload.document=historyDocument(...)
+- El documento incluye los datos de auditoría y simulación descritos anteriormente.
+
+Segundo mensaje, sólo si el inicio se persistió y el proceso llega a completarse:
+- operation=UPDATE
+- payload.collection="histData"
+- payload.id=historyId, obtenido del campo id del resultado del CREATE inicial;
+- payload.changes.eventType="INVESTIGATION_COMPLETED";
+- payload.changes.occurredAt;
+- payload.changes.result=el JSON completo serializado de ResearchResult;
+- payload.changes.description="Instrument research completed in simulation mode."
+
+No se envía ningún CREATE a biData en una ejecución sin evidencia. Si hubiera evidencia verificada, cada elemento produciría un CREATE independiente a "biData", con sourceId, sourceName, market, instrument, dataType, value, unit, currency, observedAt, collectedAt y description opcional.
+
+La respuesta de manageDatabase llega por app.manage-database.response-topic, predeterminado manageDatabase.responses, y ManageDatabaseResponseListener.receive() llama a ManageDatabaseClient.acceptResponse(). acceptResponse() busca la respuesta por correlationId, mientras validateResponse() exige coincidencia de requestId, correlationId y operation y estado SUCCESS.
+
+8. executionId e identificación de registros
+
+InvestmentResearchServiceImpl.investigate() crea executionId=UUID.randomUUID() al comenzar. Se guarda como operationId dentro del documento inicial de histData y se devuelve como executionId en ResearchResult.
+
+Existen varios identificadores distintos:
+
+- executionId: identifica el recorrido lógico de INVESTIGATION para el usuario/API.
+- historyId: id devuelto por manageDatabase al crear el documento histData; se usa para localizarlo en el UPDATE posterior.
+- messageId: UUID independiente incluido en cada envolvente Kafka.
+- correlationId: UUID independiente por petición Kafka, usado para emparejar cada respuesta de manageDatabase con su Future pendiente.
+
+Por tanto, el vinculo histórico es operationId=executionId dentro de histData. El UPDATE usa historyId, que no es el mismo que executionId. El resultado serializado dentro de histData incluye también executionId.
+
+No se añade executionId a los documentos de biData ni a los prompts; no existe una relación formal en el código entre registros biData y executionId. La persistencia de evidencia biData no incluye el operationId de la investigación.
+
+9. Ollama no disponible o respuesta inválida
+
+Si Ollama no está disponible:
+- una ConnectException, UnknownHostException o NoRouteToHostException detectada al llamar se convierte en AiProviderUnavailableException;
+- el servicio registra INVESTIGATION_FAILED en histData y propaga la excepción;
+- ApiExceptionHandler devuelve HTTP 503 con código AI_PROVIDER_UNAVAILABLE.
+
+Si excede app.research.ai-timeout, por defecto 90 segundos:
+- la Future se cancela;
+- se lanza AiProviderTimeoutException;
+- el fallo se registra en histData;
+- la API devuelve HTTP 504 con código AI_PROVIDER_TIMEOUT.
+
+Otras fallos de comunicación producen AiProviderCommunicationException y HTTP 502 con código AI_PROVIDER_COMMUNICATION_FAILED.
+
+Una respuesta vacía o JSON inválido produce InvalidAiResponseException y HTTP 502 con código INVALID_AI_RESPONSE.
+
+También se considera inválida una respuesta con campos requeridos vacíos o conclusiones incompletas en ResearchResultNormalizer.normalize(), o evidencia verificada con procedencia incompleta en filterVerifiedEvidence().
+
+Los errores de invalidación se registran en INVESTIGATION_FAILED con result={"status":"FAILED","errorCode":"INVALID_AI_RESPONSE"} o el código correspondiente. recordFailure() intenta llamar al UPDATE de histData. Si incluso ese update falla, añade la excepción de auditoría como suppressed y se devuelve el fallo original.
+
+Si falla el CREATE inicial de histData, ocurre antes del try principal de investigación y no existe historyId para registrar el fallo. ManageDatabaseClient.translatea ese error a DatabaseServiceException y ApiExceptionHandler devuelve HTTP 502 con PERSISTENCE_UNAVAILABLE.
+
+Si la respuesta es inválida, no se construye ni devuelve ResearchResult COMPLETED. No existe degradación a una respuesta simulada de emergencia ni resumen fijo de fallback.
+
+10. Estado real de implementación
+
+Implementado:
+- Controlador POST y validación de campos.
+- Rechazo de solicitudes no simuladas antes de persistir.
+- Ejecución del flujo con UUID.
+- Integración Kafka con respuestas correlacionadas y validación básica del envolvente.
+- Creación del registro inicial en histData y actualización final/fallo.
+- Integración Ollama configurable mediante Ollama ChatClient.
+- Prompt de sistema cargado desde fichero.
+- Construcción del JSON de usuario.
+- Modelo por defecto llama3.2:3b, configurable por entorno.
+- Timeout y clasificación de algunos errores de proveedor.
+- Deserialización y normalización estructurada de la respuesta.
+- Filtrado de evidencia y validación de fuentes/referencias.
+- Persistencia de evidencia verificable en biData, si existe una implementación/adaptador que la proporcione.
+- Serialización completa de la respuesta exitosa en histData.
+
+Parcialmente implementado:
+- La persistencia en biData existe y está probada, pero sólo se usará con evidencia proporcionada por un ResearchSourceAdapter real; no hay ninguno.
+- La persistencia/relación histórica existe, pero la ejecución no añade executionId a cada registro biData.
+- El JSON Schema y la validación Java están implementados, aunque Ollama puede permitir formas extra o respuestas imprevistas; el normalizador es la capa Java definitiva.
+- La gestión de errores de Ollama distingue timeout, indisponibilidad y comunicación.
+- Los errores Kafka de manageDatabase se propagan como PERSISTENCE_UNAVAILABLE.
+
+Simulado o preparado:
+- La investigación completa está limitada a simulation=true.
+- El campo simulation=true forma parte del flujo y del texto histórico, pero no transforma ni calcula datos financieros reales.
+- manageDatabase es una integración Kafka implementada, que requiere un consumidor compatible externo que implemente las operaciones CREATE/UPDATE.
+- Ollama es implementado, pero su resultado sólo es una generación local basada en el prompt, no una fuente de datos de mercado.
+- Las interfaces, beans y configuración para providers/adaptadores externos están preparados, pero no constituyen implementaciones funcionales.
+
+No implementado:
+- No existe consulta real a mercados, SAP, precios, noticias o otra fuente externa.
+- No existe implementación real de ResearchSourceAdapter distinta de la que devuelve List.of().
+- No existe persistencia real de resultados sintetizados como si fueran datos económicos: sólo se persisten los objetos de evidencia verificable recibidos por el adapter.
+- No existe modo no-simulado funcional: el servicio rechaza cualquier ResearchRequest con simulation distinto de true.
+- No existe una ejecución de órden, recomendación ejecutable, cálculo de riesgo o integración con trading.
+- No existe detección o reconciliación real de datos históricos/empresariales para ejecutar comparaciones avanzadas.
+- No existe análisis independiente posterior a Ollama ni verificación factual del contenido generado.
+
+Métodos concretos principales:
+- api/ResearchController.java: research()
+- api/ApiExceptionHandler.java: invalidRequest(), aiUnavailable(), aiTimeout(), aiCommunicationFailure(), aiProviderFailure(), invalidAiResponse(), invalidResearchEvidence(), databaseUnavailable()
+- service/impl/InvestmentResearchServiceImpl.java: investigate(), persistEvidence(), historyDocument(), recordFailure(), serializeResult(), requireId(), errorCode(), requestDescription()
+- service/impl/NoExternalResearchSourceAdapter.java: collect()
+- service/impl/ResearchPromptBuilder.java: build(), readPrompt()
+- service/impl/OllamaResearchAiProvider.java: research(), isConnectionFailure()
+- service/impl/ResearchResultNormalizer.java: normalize(), filterVerifiedEvidence(List), filterVerifiedEvidence(request, List)
+- kafka/producer/ManageDatabaseClient.java: create(), update(), acceptResponse(), execute(), validateResponse()
+- kafka/consumer/ManageDatabaseResponseListener.java: receive()
+- config/ResearchAiProviderConfiguration.java: selectedResearchAiProvider()

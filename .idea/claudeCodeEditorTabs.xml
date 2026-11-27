@@ -1,23 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ClaudeCodeEditorTabs">
-    <option name="activeSessionId" value="b3d5240e-ca9e-4261-bf4f-02e687eba7c2" />
+    <option name="activeSessionId" value="df914b22-d9e3-4ccb-b35c-a29305b1b2f9" />
     <option name="openSessionIds">
       <list>
-        <option value="d7981127-45c6-443e-8470-eb3f41b1eeb0" />
-        <option value="b3d5240e-ca9e-4261-bf4f-02e687eba7c2" />
+        <option value="df914b22-d9e3-4ccb-b35c-a29305b1b2f9" />
       </list>
     </option>
     <option name="sessionPaths">
       <map>
-        <entry key="b3d5240e-ca9e-4261-bf4f-02e687eba7c2" value="/sessions/new" />
-        <entry key="d7981127-45c6-443e-8470-eb3f41b1eeb0" value="/switch-account" />
+        <entry key="df914b22-d9e3-4ccb-b35c-a29305b1b2f9" value="/sessions/new" />
       </map>
     </option>
     <option name="sessionTitles">
       <map>
-        <entry key="b3d5240e-ca9e-4261-bf4f-02e687eba7c2" value="Claude Code" />
-        <entry key="d7981127-45c6-443e-8470-eb3f41b1eeb0" value="localhost:54468/switch-account?workingDir=C%3A%2Fworkspaces%2FAUTOMATIC_BROKER%2FengineBroker&amp;panelId=d7981127-45c6-443e-8470-eb3f41b1eeb0&amp;theme=dark" />
+        <entry key="df914b22-d9e3-4ccb-b35c-a29305b1b2f9" value="Claude Code" />
       </map>
     </option>
   </component>

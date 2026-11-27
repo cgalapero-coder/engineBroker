@@ -1,0 +1,40 @@
+Quiero realizar una revisión funcional y técnica del endpoint POST `/api/v1/research`.
+
+No modifiques ningún archivo ni implementes funcionalidades nuevas.
+
+Necesito que reconstruyas el recorrido completo de una petición desde que entra por el controlador REST hasta que se devuelve la respuesta.
+
+Utiliza como referencia esta ejecución:
+
+- market: EU
+- instrument: SAP
+- objective: Resume las hipótesis que puedan investigarse para este instrumento.
+- simulation: true
+
+La respuesta obtenida ha sido:
+
+- status: COMPLETED
+- historyPersisted: true
+- dataPersisted: false
+- persistedDataCount: 0
+- evidence: []
+- uncertainties: incluye que no hay ninguna fuente externa configurada.
+
+Explícame:
+
+1. Qué clases intervienen y cuál es la responsabilidad de cada una.
+2. Qué información recibe realmente Ollama y qué prompt se le envía.
+3. Qué modelo de Ollama se utiliza.
+4. Si existe alguna consulta a fuentes externas o si toda la respuesta procede del modelo.
+5. Cómo se construye y valida el objeto de respuesta.
+6. Por qué se ha guardado información en histData y no en biData.
+7. Qué mensajes Kafka se envían a manageDatabase y qué datos contienen.
+8. Cómo se gestiona el identificador executionId y cómo se relacionan los registros.
+9. Qué sucede si Ollama no está disponible o devuelve una respuesta inválida.
+10. Qué funcionalidades están realmente implementadas y cuáles son todavía simuladas, pendientes o meramente preparadas.
+
+Para cada explicación, indica las clases y métodos concretos del código que la implementan.
+
+Distingue claramente entre funcionalidades implementadas, funcionalidades parcialmente implementadas y funcionalidades que todavía no existen.
+
+No deduzcas que una funcionalidad existe simplemente porque haya una clase, interfaz o configuración preparada.

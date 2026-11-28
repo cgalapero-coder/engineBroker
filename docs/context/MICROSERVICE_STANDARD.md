@@ -73,5 +73,5 @@ La referencia del contrato externo Kafka está en
 `docs/prompts/prompt_copilot_manageDatabase_crud.md` es histórico y no describe
 la implementación de este repositorio. Verifica siempre la configuración activa
 en `application.yml` y `application-local.yml`; en particular, `local` usa
-SASL_PLAINTEXT/PLAIN y la prueba de contexto selecciona explícitamente el perfil
-`test` para usar Embedded Kafka.
+PLAINTEXT contra el broker local y la prueba de contexto selecciona
+explícitamente el perfil `test` para usar Embedded Kafka.

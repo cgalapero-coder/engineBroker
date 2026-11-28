@@ -214,9 +214,9 @@ usar variables de entorno/gestor de secretos.
 | `spring.profiles.default` | `local` | Perfil por defecto. |
 | `server.address` | `127.0.0.1` | Local; cambiar `SERVER_ADDRESS` solo si el despliegue lo requiere. |
 | `server.port` | `8092` | `SERVER_PORT`. |
-| `spring.kafka.bootstrap-servers` | local `localhost:30094`; base `localhost:9092` | En local, el YAML de perfil sustituye el default base. |
-| Kafka protocol | `SASL_PLAINTEXT` en local | Configuración local; no usar como recomendación de producción. |
-| Kafka SASL mechanism | `PLAIN` en local | Credenciales por `KAFKA_USERNAME`, `KAFKA_PASSWORD`; no loguear. |
+| `spring.kafka.bootstrap-servers` | local `localhost:9092`; base `localhost:9094` | `KAFKA_BOOTSTRAP_SERVERS` se puede establecer en el entorno; si no, se aplica el default del perfil activo. |
+| Kafka protocol | `PLAINTEXT` en local | El perfil local sobrescribe el protocolo SASL del YAML base; el broker local documentado no requiere autenticación. |
+| Kafka SASL credentials | No usadas en local | La configuración base permite variables `KAFKA_USERNAME` / `KAFKA_PASSWORD`; no registrarlas ni usarlas en el broker PLAINTEXT local. |
 | `spring.kafka.consumer.group-id` | `engineBroker-local` | Valor fijo en `application.yml`, no hay `KAFKA_CONSUMER_GROUP` referenciado en los YAML actuales. |
 | `auto-offset-reset` | `earliest` | Consumer. |
 | `enable-auto-commit` | `false` | Consumer. |
@@ -239,13 +239,15 @@ usar variables de entorno/gestor de secretos.
 | Nivel logger de la aplicación | `INFO` | `APP_LOG_LEVEL` para el paquete `com.gtech.automaticbroker.enginebroker`. |
 | Actuator web endpoints | `health,info,metrics` | Health sin detalles; probes liveness/readiness activas. |
 
-`KAFKA_BOOTSTRAP_SERVERS` es el default en el YAML base (`localhost:9092`), pero
-el `application-local.yml` actual configura `localhost:30094` directamente.
-No asumir que `KAFKA_BOOTSTRAP_SERVERS` override esa configuración local.
+`KAFKA_BOOTSTRAP_SERVERS` se referencia en ambos YAML: el default base es
+`localhost:9094` y el default local `localhost:9092`. El perfil local coloca
+bootstrap y `properties.security.protocol` directamente bajo `spring.kafka`;
+no anidar otro bloque `kafka` debajo de esa clave, porque Spring Boot ignoraría
+esas propiedades.
 
 El perfil `test` en `ApplicationContextTest` se activa por anotación; no hay
 `application-test.yml` visible entre los resources. `@EmbeddedKafka` sustituye
-el bootstrap de Kafka y evita heredar la autenticación SASL del perfil local.
+el bootstrap de Kafka y configura PLAINTEXT para el broker embebido.
 No quitar `@ActiveProfiles("test")` sin configurar explícitamente el contexto
 de Kafka embebido.
 

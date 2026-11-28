@@ -18,8 +18,7 @@ contrato Kafka externo con `manageDatabase`.
 - No añadas acceso MongoDB directo: la persistencia se realiza mediante Kafka.
 - No inventes fuentes de mercado, contratos, credenciales ni reglas de dominio.
 - Verifica la configuración por perfil: el perfil predeterminado `local` usa
-  Kafka SASL_PLAINTEXT/PLAIN; las pruebas de contexto seleccionan `test` y
-  Embedded Kafka.
+  Kafka PLAINTEXT; las pruebas de contexto seleccionan `test` y Embedded Kafka.
 - No registres credenciales, prompts ni respuestas completas de proveedores.
   Los errores de persistencia se traducen a respuestas HTTP genéricas; el
   handler registra la excepción Kafka para diagnóstico.

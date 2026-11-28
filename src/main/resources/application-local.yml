@@ -1,20 +1,19 @@
 server:
-    address: ${SERVER_ADDRESS:127.0.0.1}
-    port: ${SERVER_PORT:8092}
+  address: ${SERVER_ADDRESS}
+  port: ${SERVER_PORT}
 
 spring:
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
-    producer:
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-      acks: all
-      properties:
-        spring.json.add.type.headers: true
-    consumer:
-      group-id: ${KAFKA_CONSUMER_GROUP:${spring.application.name}-local}
-    kafka:
-        bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:3094}
-        properties:
-            security.protocol: SASL_PLAINTEXT
-            sasl.mechanism: PLAIN
-            sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="${KAFKA_USERNAME:appuser}" password="${KAFKA_PASSWORD}";
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+    properties:
+      security.protocol: ${KAFKA_SECURITY_PROTOCOL}
+      sasl.mechanism: ${KAFKA_SASL_MECHANISM}
+      sasl.jaas.config: 'org.apache.kafka.common.security.plain.PlainLoginModule required username="${KAFKA_USERNAME}" password="${KAFKA_PASSWORD}";'
+
+  ai:
+    ollama:
+      base-url: ${OLLAMA_BASE_URL}
+      chat:
+        options:
+          model: ${OLLAMA_MODEL}
+          temperature: ${OLLAMA_TEMPERATURE}
